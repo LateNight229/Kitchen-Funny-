@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class TimerBase : MonoBehaviour
@@ -32,9 +32,8 @@ public class TimerBase : MonoBehaviour
         }
     }
 
-    protected virtual void HandleEndTime()
+    public virtual void HandleEndTime()
     {
-
     }
 
     protected virtual float HandleCalculatePercent(float timer)

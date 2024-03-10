@@ -1,17 +1,16 @@
 ﻿using System;
 using UnityEngine;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class PlayerController : MonoBehaviour
 {
     public static event Action<bool> UnSelectedCounter;
+    public static event Action EventSpawnBoomCutting;
+    public static event Action EventSpawnSoundFx;
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
-    [SerializeField] private bool isMoving;
-    [SerializeField] private float normalSpeed = 7f;
-    [SerializeField] private float slowSpeed = 0f;
-    [SerializeField] private float rotateSpeed = 300f;
+    [SerializeField] private bool isMoving ;
+    [SerializeField] private float normalSpeed = 7f, slowSpeed = 0f, rotateSpeed = 300f;
     [SerializeField] private Transform InteracPos;
 
     [Header("Chopping")]
@@ -19,15 +18,14 @@ public class PlayerController : MonoBehaviour
 
     [Header("Holding")]
     [SerializeField] private bool DropFoodInGround;
-    [SerializeField] private GameObject kitchenObjHolding;
-    [SerializeField] private GameObject plate;
+    [SerializeField] private GameObject kitchenObjHolding, plate;
 
     [Header("Interact")]
     [SerializeField] private float interacDistance = 1f;
     public GameObject Plate { get => plate; }
 
     [SerializeField] private LayerMask CounterLayerMask;
-    private VariableJoystick joystick;
+    private DynamicJoystick joystick;
     private Animator animator;
     private CounterBase currentCounter;
     private PlateCounter plateCounter;
@@ -35,7 +33,23 @@ public class PlayerController : MonoBehaviour
     private Vector3 lastDirection;
     private Vector3 currentPosition;
     private Vector3 PositionCutting;
-    
+    private SelectedVisual selected;
+
+    public void HandleEventSpawnBoomCutting()
+    {
+        if(EventSpawnBoomCutting != null)
+        {
+            EventSpawnBoomCutting();
+        }
+    }
+    public void HandleEventSpawnSoundFx()
+    {
+        if (EventSpawnSoundFx != null)
+        {
+            EventSpawnSoundFx();
+        }
+    }
+
     public GameObject GetCurrentPlate() { return plate;   }
     public void SetCurrentPlate(GameObject plateValue)  {   plate = plateValue;   }
     public CounterBase GetCurrentCounter() {    return currentCounter;    }
@@ -45,18 +59,45 @@ public class PlayerController : MonoBehaviour
     public GameObject GetCurrentKitchenObj()  { return kitchenObjHolding;   }
     private void Awake()
     {
-        joystick = FindObjectOfType<VariableJoystick>();
+        joystick = FindFirstObjectByType<DynamicJoystick>();
         animator = GetComponentInChildren<Animator>();
-        plateCounter =GameObject.FindObjectOfType<PlateCounter>();
+        plateCounter = FindFirstObjectByType<PlateCounter>();
+    }
+    protected void Start()
+    {
+        InputManager.ClickButtonHolding += ButtonHodlingDown;
+        InputManager.ClickButtonChopping += ButtonChoppingDown;
+    }
+    bool clickedHoldingButton;
+    bool clickedChoppingButton;
+    protected void ButtonHodlingDown()
+    {
+        clickedHoldingButton = true;
+      //  Debug.Log("ButtonHodlingDown = " + clickedHoldingButton);
+    }
+    protected bool GetButtonHodlingDown()
+    {
+      //  Debug.Log("GetButtonHodlingDown = ");
+        return clickedHoldingButton;
+    }
+    protected void ButtonChoppingDown()
+    {
+        clickedChoppingButton = true;
+       // Debug.Log("ButtonChoppingDown = " + clickedChoppingButton);
+    }
+    protected bool GetButtonChoppingDown()
+    {
+       // Debug.Log("ButtonChoppingDown = ");
+        return clickedChoppingButton;
     }
     private void Reset()
     {
         knife = GameObject.Find("knife");
         InteracPos = GameObject.Find("InteracPos").transform;
     }
-    private void Update()
-    {
-         HandleInteraction();
+    protected  void Update()
+    {   
+        HandleInteraction();
     }
     void FixedUpdate()
     {
@@ -73,7 +114,6 @@ public class PlayerController : MonoBehaviour
         }
 
         RaycastHit raycastHit;
-        // <<nhiem vu tiep theo : tao ray xem raycast chieu nhu nao tren scene ? bug: selected 2 counter >>
         if (Physics.Raycast(InteracPos.position, lastDirection, out raycastHit, interacDistance, CounterLayerMask))
         {
             if (raycastHit.transform.TryGetComponent(out CounterBase counter))
@@ -84,25 +124,46 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                 {   
-                    SelectedVisual selected = counter.GetComponentInChildren<SelectedVisual>();
-                    if (selected != null)
+                    if(selected == null)
                     {
-                        selected.Selected(true);
-                        SetlastCounter(counter);
+                        selected = counter.GetComponentInChildren<SelectedVisual>();
+                        if (selected != null)
+                        {
+                            selected.Selected(true);
+                            SetlastCounter(counter);
+                        }
                     }
-                    else { Debug.Log("obj not select"); }
+                    else
+                    {
+                        if (UnSelectedCounter != null) UnSelectedCounter(false);
+                        selected = counter.GetComponentInChildren<SelectedVisual>();
+                        if (selected != null)
+                        {
+                            selected.Selected(true);
+                            SetlastCounter(counter);
+                        }
+                    }
                 }
 
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (Input.GetKeyDown(KeyCode.Space) || GetButtonHodlingDown())
                 {
-                    //Debug.Log("Space + " + counter.ToString());
+                    SoundManager.instance.HandlePlaySound("taking",volume: 1f);
+                    clickedHoldingButton = false;
                     counter.Interact(kitchenObjHolding, plate);
+                    PositionCutting = transform.position;
                 }
-                else if (Input.GetKeyDown(KeyCode.LeftAlt))
-                {   
+                else if (Input.GetKeyDown(KeyCode.LeftAlt) || GetButtonChoppingDown())
+                {
+                    clickedChoppingButton = false;
                     PositionCutting = transform.position;
                     currentCounter.ResumeStew();
                     counter.PerformOperation();
+                    Debug.Log("ResumeStew");
+                }
+                if (Vector3.Distance(PositionCutting, transform.position) > 0.1f)
+                {
+                    currentCounter.PauseStew();
+                    Debug.Log("PauseStew");
                 }
             }
         }
@@ -114,7 +175,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (kitchenObjHolding != null)
                 {
-                    CounterBase counter = FindObjectOfType<CounterBase>();
+                    CounterBase counter = FindFirstObjectByType<CounterBase>();
                     currentCounter.PlayerRemoveKitchenObj(kitchenObjHolding);
                 }
             }
@@ -159,7 +220,7 @@ public class PlayerController : MonoBehaviour
     }
     public  void animationChopping(bool value)
     {   
-        //animator.SetBool("chop", value);
+        animator.SetBool("chop", value);
         knife.SetActive(value);
     }
 

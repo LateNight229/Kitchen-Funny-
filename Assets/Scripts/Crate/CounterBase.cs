@@ -10,7 +10,7 @@ public class CounterBase :  MonoBehaviour, IBarTime
     protected virtual void Start()
     {
         pool = GetComponent<ObjectPool>();   
-        playerController = FindObjectOfType<PlayerController>();
+        playerController = FindFirstObjectByType<PlayerController>();
         handPlayer = GameObject.Find("hand").transform;
     }
     public virtual void Interact(GameObject kitchenObj, GameObject plate)

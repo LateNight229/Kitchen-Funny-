@@ -3,13 +3,21 @@ using UnityEngine;
 
 public class PoolBase : MonoBehaviour
 {
-   protected virtual void Spawn(GameObject prefab, List<GameObject> list, Transform parent, int countPrefabs)
+   protected virtual void HandleSpawn(GameObject prefab, List<GameObject> list, Transform parent, int countPrefabs)
    {   
         for( int i = 0; i < countPrefabs; i++)
         {
             var obj = Instantiate(prefab);
-            obj.SetActive(false);
-            obj.transform.parent = parent;
+            obj.SetActive(false); 
+            var rectTransform = obj.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.SetParent(parent, false);
+            }
+            else
+            {
+                obj.transform.parent = parent;
+            }
             list.Add(obj);
         }
    }

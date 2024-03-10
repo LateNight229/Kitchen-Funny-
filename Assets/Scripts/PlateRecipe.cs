@@ -26,9 +26,18 @@ public class PlateRecipe : MonoBehaviour
     }
     private void Start()
     {
-        recipe = FindObjectOfType<RecipeManager>();
-        handleCompleteDish = FindObjectOfType<HandleCompleteDish>();
+        recipe = FindFirstObjectByType<RecipeManager>();
+        if(recipe != null)
+        {
+            //Debug.Log("recipe");
+        }
+        else
+        {
+           // Debug.LogWarning("recipe not find");
+        }
+        handleCompleteDish = FindFirstObjectByType<HandleCompleteDish>();
         HandleTurnOfAllImage();
+        currentTypeFood = TypeDishLevel1.Null;
 
     }
     private void HandleTurnOfAllImage()
@@ -82,7 +91,7 @@ public class PlateRecipe : MonoBehaviour
     private void CheckRecipe()
     {
         currentTypeFood = recipe.FindRecipe(ingredients);
-        Debug.Log("currentTypeFood = " + currentTypeFood);
+        //Debug.Log("currentTypeFood = " + currentTypeFood);
         handleCompleteDish.HandleDetermineDishType(currentTypeFood);
     }
     public TypeDishLevel1 GetCurrentTypeFood()

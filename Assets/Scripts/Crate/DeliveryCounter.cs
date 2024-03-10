@@ -8,7 +8,7 @@ public class DeliveryCounter : CounterBase
     protected override void Start()
     {
         base.Start();
-        orderManager = GameObject.FindObjectOfType<OrderManager>();
+        orderManager = GameObject.FindFirstObjectByType<OrderManager>();
     }
 
     public override void Interact(GameObject kitchenObj, GameObject plate)
@@ -20,8 +20,16 @@ public class DeliveryCounter : CounterBase
     }
 
     private void HandleSendFoodToOrderManager(TypeDishLevel1 typeFood)
-    {
-        orderManager.HandleTakeFood(typeFood);
+    {   
+        if(orderManager != null)
+        {
+           orderManager.HandleTakeFood(typeFood);
+
+        }
+        else
+        {
+            Debug.LogWarning("Null orderManager");
+        }
     }
 
 }

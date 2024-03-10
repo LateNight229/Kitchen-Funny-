@@ -9,7 +9,7 @@ public class ObjectPool : PoolBase
     public Transform parent;
     void Start()
     {
-        Spawn(Prefab, listPrefabs, parent, countPrefabs);
+        HandleSpawn(Prefab, listPrefabs, parent, countPrefabs);
     }
 
     public GameObject GetPrefab()

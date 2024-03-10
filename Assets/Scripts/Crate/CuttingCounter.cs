@@ -1,36 +1,59 @@
 using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class CuttingCounter : StorageCounter
 {
     public Image timeWaitUI;
     public Canvas canvas;
     public GameObject knife;
+    public Image boomCutting;
 
-    [SerializeField] private float timeChopping = 1.5f;
+    /*[SerializeField] private*/ public float timeChopping ;
 
     private ProcessedFood food;
     private float choppingTimer;
     private bool isChopping = false;
     private bool isPaused;
 
+    public void HandleVfxCutting() 
+    {
+        boomCutting.enabled = true;
+        Invoke("OffBoomCutting", 0.1f);
+    }
+    public void HandleSfxCutting()
+    {
+        SoundManager.instance.HandlePlaySound("chopingOne", 0.6f);
+    }
+
+    private void OffBoomCutting()
+    {
+        boomCutting.enabled = false;
+    }
     public override void PauseStew()
     {
         isPaused = true;
+        Debug.Log("isPaused = " + isPaused);
     }
-
     public override void ResumeStew()
     {
         isPaused = false;
+        Debug.Log("isPaused = " + isPaused);
     }
 
     protected override void Start()
     {   
         base.Start();
         ModifierOffSet();
+        PlayerController.EventSpawnBoomCutting += HandleVfxCutting;
+        PlayerController.EventSpawnBoomCutting += HandleSfxCutting;
     }
-
+    private void OnDestroy()
+    {
+        PlayerController.EventSpawnBoomCutting -= HandleVfxCutting;
+        PlayerController.EventSpawnBoomCutting -= HandleSfxCutting;
+    }
     void ModifierOffSet()
     {
         
@@ -61,7 +84,7 @@ public class CuttingCounter : StorageCounter
     public override void PerformOperation() { Cutting();}
     private void Cutting()
     {
-        Debug.Log("Join Cutting In Cutting Board!");
+        //Debug.Log("Join Cutting In Cutting Board!");
         if (kitchenObjOnCounter == null) return;
         food = this.GetProcessedFood();
         if (food.GetProcessedDone()) { return; }

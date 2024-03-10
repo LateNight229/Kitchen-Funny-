@@ -8,6 +8,10 @@ public class SelectedVisual : MonoBehaviour
     {
         PlayerController.UnSelectedCounter += Selected;
     }
+    private void OnDestroy()
+    {
+        PlayerController.UnSelectedCounter -= Selected;
+    }
     public void Selected(bool value)
     {
         selectedVisual.SetActive(value);

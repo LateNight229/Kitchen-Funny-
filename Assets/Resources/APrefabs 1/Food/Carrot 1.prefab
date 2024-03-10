@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fbdbcec4aa48dd4181f9f00ce1c945c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  idleFood: {fileID: 2949346846042774459}
+  idleFood: {fileID: 3228579741892699843}
   stewFood: {fileID: 4056722860153022326}
   burnFood: {fileID: 7457796746611755735}
   currentState: 0
@@ -327,7 +327,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 3bfb6768ca07e8f41a56add5e83b785e, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: b035d422fdf2df644aab6200255e2b3b, type: 2}
     - target: {fileID: 919132149155446097, guid: 3bfb6768ca07e8f41a56add5e83b785e, type: 3}
@@ -473,7 +473,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 3bfb6768ca07e8f41a56add5e83b785e, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 72eefe96a6febc04db0a0a647af3d300, type: 2}
     - target: {fileID: 919132149155446097, guid: 3bfb6768ca07e8f41a56add5e83b785e, type: 3}

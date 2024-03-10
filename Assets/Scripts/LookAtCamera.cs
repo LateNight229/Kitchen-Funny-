@@ -6,7 +6,7 @@ public class LookAtCamera : MonoBehaviour
 
     private void Awake()
     {
-        _camera = FindObjectOfType<Camera>();         
+        _camera = FindFirstObjectByType<Camera>();         
     }
     private void LateUpdate()
     {

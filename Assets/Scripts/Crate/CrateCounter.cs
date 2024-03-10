@@ -1,6 +1,5 @@
 ﻿
 using UnityEngine;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class CrateCounter : CounterBase
 {
